@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* shadcn base styles */
+@import "shadcn/tailwind.css";
+
+html,
+body {
+  height: 100%;
+}
