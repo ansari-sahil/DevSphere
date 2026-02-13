@@ -4,9 +4,6 @@ import User from "../models/User.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
 import { sendEmail } from "../utils/email.js";
 
-// ============================
-// REGISTER
-// ============================
 export const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
@@ -20,8 +17,6 @@ export const register = async (req, res, next) => {
     }
 
     const user = await User.create({ name, email, password });
-
-    // create verification token (hashed in DB)
     const rawToken = crypto.randomBytes(32).toString("hex");
 
     user.emailVerificationToken = crypto
@@ -52,9 +47,6 @@ export const register = async (req, res, next) => {
   }
 };
 
-// ============================
-// VERIFY EMAIL
-// ============================
 export const verifyEmail = async (req, res, next) => {
   try {
     const hashedToken = crypto
@@ -87,9 +79,6 @@ export const verifyEmail = async (req, res, next) => {
   }
 };
 
-// ============================
-// LOGIN
-// ============================
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -126,9 +115,6 @@ export const login = async (req, res, next) => {
   }
 };
 
-// ============================
-// REFRESH ACCESS TOKEN
-// ============================
 export const refresh = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
@@ -171,9 +157,6 @@ export const refresh = async (req, res, next) => {
   }
 };
 
-// ============================
-// LOGOUT
-// ============================
 export const logout = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
@@ -190,9 +173,6 @@ export const logout = async (req, res, next) => {
   }
 };
 
-// ============================
-// FORGOT PASSWORD
-// ============================
 export const forgotPassword = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
@@ -219,9 +199,9 @@ export const forgotPassword = async (req, res, next) => {
       to: user.email,
       subject: "Password Reset",
       html: `
-        <p>Your password reset token:</p>
-        <h2>${rawToken}</h2>
-        <p>This token expires in 10 minutes.</p>
+        Your password reset token:
+        ${rawToken}
+        
       `,
     });
 
@@ -234,9 +214,6 @@ export const forgotPassword = async (req, res, next) => {
   }
 };
 
-// ============================
-// RESET PASSWORD
-// ============================
 export const resetPassword = async (req, res, next) => {
   try {
     const hashed = crypto
