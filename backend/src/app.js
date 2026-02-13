@@ -7,21 +7,46 @@ import morgan from "morgan";
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import hpp from "hpp";
+import compression from "compression";
+import timeout from "connect-timeout";
 
 const app = express();
 
-app.use(helmet());
-app.use(cors());
+app.disable("x-powered-by");
+s;
+app.use(timeout("15s"));
+app.use(hpp());
+app.use(compression());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
+app.use(
+  cors({
+    origin: "*", // later restrict to frontend domain
+    credentials: true,
+  }),
+);
 app.use(express.json());
-
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
   }),
 );
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
-app.use(morgan("dev"));
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+  });
+});
+
+app.set("trust proxy", 1);
 
 app.get("/", (req, res) => {
   res.json({ message: "DevSphere API Running" });
@@ -30,6 +55,14 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 
 app.use("/api/admin", adminRoutes);
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    uptime: process.uptime(),
+    timestamp: new Date(),
+  });
+});
 
 app.use(errorHandler);
 
