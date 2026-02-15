@@ -21,7 +21,7 @@ export default function AdminRoute({ children }: Props) {
       return;
     }
 
-    API.get("/auth/profile")
+    API.get("api/auth/profile")
       .then((res) => {
         if (res.data.role !== "admin") {
           router.replace("/dashboard");

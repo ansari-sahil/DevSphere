@@ -8,7 +8,7 @@ export default function Sidebar() {
   const [role, setRole] = useState("");
 
   useEffect(() => {
-    API.get("/profile")
+    API.get("api/auth/profile")
       .then((res) => setRole(res.data.role))
       .catch(() => setRole(""));
   }, []);
