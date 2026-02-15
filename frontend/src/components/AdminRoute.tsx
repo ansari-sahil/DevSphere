@@ -1,21 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import API from "@/lib/api";
+import { useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { getAccessToken } from "@/lib/auth";
+import API from "@/lib/api";
 
-export default function AdminRoute({ children }: any) {
-  const [allowed, setAllowed] = useState(false);
+interface Props {
+  children: ReactNode;
+}
+
+export default function AdminRoute({ children }: Props) {
   const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    API.get("/api/auth/profile").then((res) => {
-      if (res.data.role === "admin") setAllowed(true);
-      else router.push("/dashboard");
-    });
-  }, []);
+    const token = getAccessToken();
 
-  if (!allowed) return null;
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
 
-  return children;
+    API.get("/auth/profile")
+      .then((res) => {
+        if (res.data.role !== "admin") {
+          router.replace("/dashboard");
+        } else {
+          setAuthorized(true);
+        }
+      })
+      .catch(() => router.replace("/login"));
+  }, [router]);
+
+  if (!authorized) return null;
+
+  return <>{children}</>;
 }

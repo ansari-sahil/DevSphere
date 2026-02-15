@@ -109,10 +109,26 @@ export const login = async (req, res, next) => {
       success: true,
       accessToken,
       refreshToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (err) {
     next(err);
   }
+};
+
+export const getProfile = async (req, res) => {
+  res.json({
+    id: req.user._id,
+    name: req.user.name,
+    email: req.user.email,
+    role: req.user.role,
+    isEmailVerified: req.user.isEmailVerified,
+  });
 };
 
 export const refresh = async (req, res, next) => {

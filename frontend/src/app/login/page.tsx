@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import { loginUser } from "@/lib/auth";
 
 import { Button } from "@/components/ui/button";
@@ -21,19 +20,26 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
 
     try {
-      await loginUser(form);
-      router.push("/dashboard");
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "Login failed");
+      const data = await loginUser(form);
+
+      // decode role from token response (if included)
+      const role = data.user?.role;
+
+      if (role === "admin") {
+        router.push("/admin");
       } else {
-        setError("Something went wrong");
+        router.push("/dashboard");
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Invalid credentials");
       }
     } finally {
       setLoading(false);

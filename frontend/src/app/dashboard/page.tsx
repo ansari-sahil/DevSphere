@@ -1,59 +1,77 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DashboardLayout from "@/components/dashboard-layout";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import API from "@/lib/api";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import DashboardLayout from "@/components/dashboard-layout";
+
+interface Stats {
+  totalUsers: number;
+  activeUsers: number;
+  admins: number;
+  verifiedUsers: number;
+}
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    API.get("/api/admin/stats").then((res) => setStats(res.data));
+    const fetchDashboardData = async () => {
+      try {
+        // 1️⃣ get logged-in user
+        const profileRes = await API.get("/api/auth/profile");
+        const user = profileRes.data;
+
+        // 2️⃣ if admin → fetch stats
+        if (user.role === "admin") {
+          const statsRes = await API.get("/api/admin/stats");
+          setStats(statsRes.data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, []);
 
   return (
-    <ProtectedRoute>
-      <DashboardLayout>
-        {!stats ? (
-          <div className="grid gap-6 md:grid-cols-3">
-            <Skeleton className="h-28" />
-            <Skeleton className="h-28" />
-            <Skeleton className="h-28" />
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Users</CardTitle>
-              </CardHeader>
-              <CardContent className="text-3xl font-bold">
-                {stats.users}
-              </CardContent>
-            </Card>
+    <DashboardLayout>
+      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Active</CardTitle>
-              </CardHeader>
-              <CardContent className="text-3xl font-bold">
-                {stats.active}
-              </CardContent>
-            </Card>
+      {loading && <p>Loading...</p>}
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Admins</CardTitle>
-              </CardHeader>
-              <CardContent className="text-3xl font-bold">
-                {stats.admins}
-              </CardContent>
-            </Card>
+      {!loading && stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="p-6 border rounded-lg text-center">
+            <p className="text-sm text-muted-foreground">Total Users</p>
+            <p className="text-2xl font-bold">{stats.totalUsers}</p>
           </div>
-        )}
-      </DashboardLayout>
-    </ProtectedRoute>
+
+          <div className="p-6 border rounded-lg text-center">
+            <p className="text-sm text-muted-foreground">Active Users</p>
+            <p className="text-2xl font-bold">{stats.activeUsers}</p>
+          </div>
+
+          <div className="p-6 border rounded-lg text-center">
+            <p className="text-sm text-muted-foreground">Admins</p>
+            <p className="text-2xl font-bold">{stats.admins}</p>
+          </div>
+
+          <div className="p-6 border rounded-lg text-center">
+            <p className="text-sm text-muted-foreground">Verified Users</p>
+            <p className="text-2xl font-bold">{stats.verifiedUsers}</p>
+          </div>
+        </div>
+      )}
+
+      {!loading && !stats && (
+        <p className="text-muted-foreground">
+          Welcome! You are logged in successfully.
+        </p>
+      )}
+    </DashboardLayout>
   );
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import Sidebar from "./sidebar";
 import Topbar from "./topbar";
 
@@ -10,9 +12,9 @@ export default function DashboardLayout({
     <div className="flex min-h-screen">
       <Sidebar />
 
-      <div className="flex flex-col flex-1">
+      <div className="flex-1">
         <Topbar />
-        <main className="p-6 bg-muted/40 flex-1">{children}</main>
+        <main className="p-6">{children}</main>
       </div>
     </div>
   );

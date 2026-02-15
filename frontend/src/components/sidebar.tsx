@@ -1,36 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-const nav = [
-  { name: "Dashboard", href: "/dashboard" },
-  { name: "Profile", href: "/profile" },
-  { name: "Admin", href: "/admin" },
-];
+import { useEffect, useState } from "react";
+import API from "@/lib/api";
 
 export default function Sidebar() {
-  const path = usePathname();
+  const [role, setRole] = useState("");
+
+  useEffect(() => {
+    API.get("/profile")
+      .then((res) => setRole(res.data.role))
+      .catch(() => setRole(""));
+  }, []);
 
   return (
-    <aside className="w-64 border-r bg-background p-6">
-      <h2 className="text-xl font-bold mb-8">DevSphere</h2>
+    <aside className="w-64 border-r p-6 space-y-4">
+      <Link href="/dashboard">Dashboard</Link>
+      <Link href="/profile">Profile</Link>
 
-      <nav className="space-y-2">
-        {nav.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`block px-3 py-2 rounded-lg ${
-              path === item.href
-                ? "bg-primary text-primary-foreground"
-                : "hover:bg-muted"
-            }`}
-          >
-            {item.name}
-          </Link>
-        ))}
-      </nav>
+      {role === "admin" && (
+        <>
+          <Link href="/admin">Admin Panel</Link>
+          <Link href="/admin/users">Manage Users</Link>
+        </>
+      )}
     </aside>
   );
 }

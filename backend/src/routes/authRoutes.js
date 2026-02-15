@@ -7,6 +7,7 @@ import {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  getProfile,
 } from "../controllers/authController.js";
 import { validate } from "../middleware/validate.js";
 import {
@@ -25,6 +26,8 @@ router.post("/login", loginValidator, loginLimiter, validate, login);
 router.post("/refresh", refresh);
 router.post("/logout", protect, logout);
 router.get("/verify-email/:token", verifyEmail);
+router.get("/profile", protect, getProfile);
+
 router.post(
   "/forgot-password",
   forgotPasswordValidator,
