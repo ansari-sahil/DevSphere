@@ -26,7 +26,7 @@ export const register = async (req, res, next) => {
 
     await user.save();
 
-    const verifyURL = `http://localhost:5000/api/auth/verify-email/${rawToken}`;
+    const verifyURL = `${process.env.API_URL}/api/auth/verify-email/${rawToken}`;
 
     await sendEmail({
       to: user.email,
