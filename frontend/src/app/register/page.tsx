@@ -2,10 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { registerUser } from "@/lib/auth";
-import axios from "axios";
+import AuthBackground from "@/components/auth-background";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import API from "@/lib/api";
+import { Rocket } from "lucide-react";
 
-export default function Register() {
+export default function RegisterPage() {
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -15,22 +20,21 @@ export default function Register() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    setErrorMsg(null);
+    setError("");
     setLoading(true);
 
     try {
-      await registerUser(form);
+      await API.post("/auth/register", form);
       router.push("/login");
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        setErrorMsg(error.response?.data?.message || "Registration failed");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
       } else {
-        setErrorMsg("Something went wrong");
+        setError("Something went wrong");
       }
     } finally {
       setLoading(false);
@@ -38,55 +42,64 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-md w-full max-w-md space-y-5"
-      >
-        <h1 className="text-2xl font-bold text-center text-gray-800">
-          Create Account
-        </h1>
+    <AuthBackground>
+      <Card className="w-105 bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl">
+        <CardContent className="p-8 space-y-6">
+          <div className="text-center space-y-2">
+            <Rocket className="mx-auto text-purple-300" size={36} />
+            <h1 className="text-3xl font-bold text-purple-200">
+              Join DevSphere
+            </h1>
+            <p className="text-gray-400 text-sm">Build. Connect. Grow.</p>
+          </div>
 
-        {errorMsg && (
-          <p className="text-red-500 text-sm text-center">{errorMsg}</p>
-        )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              placeholder="Full Name"
+              required
+              className="bg-transparent border-white/20 focus-visible:ring-purple-400 input-glow"
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
 
-        <input
-          placeholder="Full Name"
-          className="w-full border border-gray-300 rounded-lg p-3"
-          value={form.name}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, name: e.target.value }))
-          }
-        />
+            <Input
+              type="email"
+              placeholder="Email Address"
+              required
+              className="bg-transparent border-white/20 focus-visible:ring-purple-400 input-glow"
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
 
-        <input
-          type="email"
-          placeholder="Email address"
-          className="w-full border border-gray-300 rounded-lg p-3"
-          value={form.email}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, email: e.target.value }))
-          }
-        />
+            <Input
+              type="password"
+              placeholder="Password"
+              required
+              className="bg-transparent border-white/20 focus-visible:ring-purple-400 input-glow"
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full border border-gray-300 rounded-lg p-3"
-          value={form.password}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, password: e.target.value }))
-          }
-        />
+            {error && (
+              <p className="text-red-400 text-sm text-center">{error}</p>
+            )}
 
-        <button
-          disabled={loading}
-          className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition disabled:opacity-50"
-        >
-          {loading ? "Creating..." : "Create Account"}
-        </button>
-      </form>
-    </div>
+            <Button
+              className="w-full bg-linear-to-r from-purple-500 to-indigo-600 hover:opacity-90 transition text-white"
+              disabled={loading}
+            >
+              {loading ? "Creating..." : "Register"}
+            </Button>
+          </form>
+
+          <p className="text-center text-gray-400 text-sm">
+            Already have an account?{" "}
+            <Link
+              href="/login"
+              className="text-purple-300 hover:text-purple-200"
+            >
+              Login
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    </AuthBackground>
   );
 }

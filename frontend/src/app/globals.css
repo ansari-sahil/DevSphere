@@ -1,10 +1,34 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
-/* shadcn base styles */
-@import "shadcn/tailwind.css";
+:root {
+  --radius: 0.75rem;
 
-html,
+  --background: #f6f3ff;
+  --foreground: #1a1333;
+
+  --card: rgba(255, 255, 255, 0.7);
+  --card-foreground: #1a1333;
+
+  --border: rgba(120, 90, 255, 0.2);
+  --primary: #7c5cff;
+}
+
+.dark {
+  --background: #0b0620;
+  --foreground: #ffffff;
+
+  --card: rgba(255, 255, 255, 0.05);
+  --card-foreground: #ffffff;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --primary: #9f7aea;
+}
+
 body {
-  height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.input-glow:focus {
+  box-shadow: 0 0 0 2px rgba(168, 139, 250, 0.5);
 }
