@@ -28,7 +28,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await API.post("/auth/register", form);
+      await API.post("api/auth/register", form);
       router.push("/login");
     } catch (err: unknown) {
       if (err instanceof Error) {

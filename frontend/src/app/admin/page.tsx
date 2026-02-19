@@ -5,12 +5,7 @@ export default function AdminPage() {
   return (
     <AdminRoute>
       <DashboardLayout>
-        <div className="space-y-2">
-          <h2 className="text-3xl font-bold">Admin Panel</h2>
-          <p className="text-muted-foreground">
-            Manage users and system settings
-          </p>
-        </div>
+        <h1 className="text-2xl font-bold">Admin Panel</h1>
       </DashboardLayout>
     </AdminRoute>
   );

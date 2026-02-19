@@ -5,8 +5,8 @@ import LogoutButton from "./LogoutButton";
 
 export default function Topbar() {
   return (
-    <header className="flex items-center justify-between px-8 py-4 border-b border-white/10 bg-white/5 backdrop-blur-xl">
-      <h1 className="font-semibold text-lg text-purple-200">Dashboard</h1>
+    <header className="flex items-center justify-between px-6 py-4 border-b border-purple-500/20 backdrop-blur-xl bg-purple-900/20">
+      <h1 className="text-lg font-semibold text-purple-200">Dashboard</h1>
 
       <div className="flex items-center gap-4">
         <ThemeToggle />
